@@ -50,7 +50,13 @@ class Generator {
       mkdir($migrationDirectory, 0777, true);
     }
     $migrationName = date('Y_m_d_His', time()) . '_create_' . strtolower($this->component) . 's';
+    $tableName = strtolower($this->component) . 's';
     $filename = $migrationDirectory . '/' . $migrationName . '.php';
+    $columns = '';
+    foreach ($this->fields as $field) {
+      list($name, $type) = explode(':', $field);
+      $columns .= '            $table->' . $type . "('" . $name . "');\n";
+    }
     $content = "<?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -64,7 +70,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('', function(Blueprint \$table) {
+            \$table->id();
+$columns
+            \$table->timestamps();
+        });
     }
 
     /**
@@ -72,7 +82,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('$tableName');
     }
 };
 ";
