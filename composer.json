@@ -1,0 +1,11 @@
+{
+    "require": {
+        "symfony/console": "^6.4"
+    },
+    "autoload": {
+      "psr-4": {
+        "Console\\": "src"
+      },
+      "classmap": ["src"]
+    }
+}
