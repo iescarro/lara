@@ -42,6 +42,7 @@ class Generator {
     $this->generateModel();
     $this->generateViews();
     $this->generateController();
+    $this->updateRoute();
   }
 
   function generateMigration() {
