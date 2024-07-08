@@ -31,6 +31,8 @@ class GenerateCommand extends Command {
 }
 
 class Generator {
+  private $component;
+  private $fields;
 
   function __construct($component, $fields) {
     $this->component = $component;
