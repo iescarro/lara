@@ -1,4 +1,11 @@
 {
+    "name": "iescarro/lara",
+    "type": "library",
+    "description": "Simple Laravel Scaffold",
+    "keywords": [
+        "laravel",
+        "scaffold"
+    ],
     "require": {
         "symfony/console": "^6.4"
     },
