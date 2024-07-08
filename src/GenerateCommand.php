@@ -165,6 +165,29 @@ class $controllerName extends Controller
     file_put_contents($filename, $content);
   }
 
+  function updateRoute() {
+    $routesDirectory = 'routes';
+    if (!is_dir($routesDirectory)) {
+      mkdir($routesDirectory, 0777, true);
+    }
+    $routeFileName = $routesDirectory . '/web.php';
+    $controllerName = ucwords($this->component) . 'sController';
+    $variableName = strtolower($this->component);
+    $arrayName = strtolower($this->component) . 's';
+    $content = "
+Route::get('/$arrayName', [$controllerName::class, 'index'])->name('$arrayName.index');
+Route::get('/$arrayName/add', [$controllerName::class, 'add'])->name('$arrayName.add');
+Route::post('/$arrayName/store', [$controllerName::class, 'store'])->name('$arrayName.store');
+Route::get('/$arrayName/edit', [$controllerName::class, 'edit'])->name('$arrayName.edit');
+Route::put('/$arrayName/update', [$controllerName::class, 'update'])->name('$arrayName.update');
+Route::delete('/$arrayName/{$variableName}', [$controllerName::class, 'destroy'])->name('$arrayName.destroy');";
+    $routeFile = fopen($routeFileName, 'a');
+    if ($routeFile) {
+      fwrite($routeFile, $content);
+      fclose($routeFile);
+    }
+}
+
   function generateTests() {
     // TODO:
   }
