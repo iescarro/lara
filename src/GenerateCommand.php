@@ -1,23 +1,29 @@
 <?php
+
 namespace Console;
+
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GenerateCommand extends Command {
+class GenerateCommand extends Command
+{
 
-  public function __construct() {
+  public function __construct()
+  {
     parent::__construct();
   }
 
-  public function configure() {
+  public function configure()
+  {
     $this->setName('generate:scaffold')
       ->addArgument('component', InputArgument::REQUIRED, '')
       ->addArgument('fields', InputArgument::IS_ARRAY, '');
   }
 
-  public function execute(InputInterface $input, OutputInterface $output) {
+  public function execute(InputInterface $input, OutputInterface $output)
+  {
     $component = $input->getArgument('component');
     $fields = $input->getArgument('fields');
     // foreach ($fields as $field) {
@@ -30,16 +36,19 @@ class GenerateCommand extends Command {
   }
 }
 
-class Generator {
+class Generator
+{
   private $component;
   private $fields;
 
-  function __construct($component, $fields) {
+  function __construct($component, $fields)
+  {
     $this->component = $component;
     $this->fields = $fields;
   }
 
-  function scaffold() {
+  function scaffold()
+  {
     $this->generateMigration();
     $this->generateModel();
     $this->generateViews();
@@ -47,7 +56,8 @@ class Generator {
     $this->updateRoute();
   }
 
-  function generateMigration() {
+  function generateMigration()
+  {
     $migrationDirectory = 'database/migrations';
     if (!is_dir($migrationDirectory)) {
       mkdir($migrationDirectory, 0777, true);
@@ -92,7 +102,8 @@ $columns
     file_put_contents($filename, $content);
   }
 
-  function generateModel() {
+  function generateModel()
+  {
     $modelDirectory = 'app/Models';
     if (!is_dir($modelDirectory)) {
       mkdir($modelDirectory, 0777, true);
@@ -114,7 +125,8 @@ class $modelName extends Model
     file_put_contents($filename, $content);
   }
 
-  function generateViews() {
+  function generateViews()
+  {
     $viewsDirectory = 'resources/views/' . strtolower($this->component) . 's';
     if (!is_dir($viewsDirectory)) {
       mkdir($viewsDirectory, 0777, true);
@@ -132,43 +144,70 @@ class $modelName extends Model
     file_put_contents($indexViewFileName, $indexViewContent);
   }
 
-  function generateController() {
+  function generateController()
+  {
     $controllerDirectory = 'app/Http/Controllers';
     if (!is_dir($controllerDirectory)) {
       mkdir($controllerDirectory, 0777, true);
     }
     $controllerName = ucwords($this->component) . 'sController';
+    $componentName = lcfirst($this->component);
+    $componentsName = lcfirst($this->component) . 's';
+    $className = ucwords($this->component);
+    $variableName = '$' . lcfirst($this->component);
+    $arrayName = '$' . lcfirst($this->component) . 's';
     $filename = $controllerDirectory . '/' . $controllerName . '.php';
     $content = "<?php
 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\\$className;
 
 class $controllerName extends Controller
 {
-    //
-
-    public function index() {
-
+    public function index()
+    {
+        $arrayName = $className::all();
+        return view('$componentsName.index', ['$componentsName' => $arrayName]);
     }
 
-    public function add() {
-
+    public function add()
+    {
+        return view('$componentsName.add');
     }
 
-    public function edit() {
-
+    public function store(Request \$request)
+    {
+        $className::create(\$request->all());
+        redirect()->route('$componentsName.index')
+            ->with('success', '$className created successfully.');
     }
 
-    public function delete() {
-        
+    public function edit($className $variableName)
+    {
+        return view('$componentsName.edit', ['post' => $variableName]);
+    }
+
+    private function update(Request \$request)
+    {
+        $className::update(\$request->all());
+        redirect()->route('$componentsName.index')
+            ->with('success', '$className updated successfully.');
+    }
+
+    public function destroy($className $variableName)
+    {
+        {$variableName}->delete();
+        redirect()->route('$arrayName.index')
+            ->with('success', '$className deleted successfully.');
     }
 }";
     file_put_contents($filename, $content);
   }
 
-  function updateRoute() {
+  function updateRoute()
+  {
     $routesDirectory = 'routes';
     if (!is_dir($routesDirectory)) {
       mkdir($routesDirectory, 0777, true);
@@ -189,9 +228,10 @@ Route::delete('/$arrayName/{$variableName}', [$controllerName::class, 'destroy']
       fwrite($routeFile, $content);
       fclose($routeFile);
     }
-}
+  }
 
-  function generateTests() {
+  function generateTests()
+  {
     // TODO:
   }
 }
