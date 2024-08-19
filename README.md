@@ -14,7 +14,7 @@ composer require iescarro/lara
 
 Lara can be used to generate scaffold components in your Laravel application. The basic syntax for generating a scaffold is:
 
-```sh```
+```sh
 php vendor/iescarro/lara/lara generate scaffold <ModelName> <field1:type> <field2:type> ...
 ```
 
