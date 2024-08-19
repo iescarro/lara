@@ -9,20 +9,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateCommand extends Command
 {
+  protected static $defaultName = 'generate:scaffold'; // Use static property for default command name
 
   public function __construct()
   {
     parent::__construct();
   }
 
-  public function configure()
+  public function configure(): void
   {
-    $this->setName('generate:scaffold')
+    $this
+      ->setName('generate:scaffold')
+      ->setDescription('')
       ->addArgument('component', InputArgument::REQUIRED, '')
       ->addArgument('fields', InputArgument::IS_ARRAY, '');
   }
 
-  public function execute(InputInterface $input, OutputInterface $output)
+  public function execute(InputInterface $input, OutputInterface $output): int
   {
     $component = $input->getArgument('component');
     $fields = $input->getArgument('fields');
