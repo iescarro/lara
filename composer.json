@@ -1,18 +1,20 @@
 {
-    "name": "iescarro/lara",
-    "type": "library",
-    "description": "Simple Laravel Scaffold",
-    "keywords": [
-        "laravel",
-        "scaffold"
-    ],
-    "require": {
-        "symfony/console": "^6.4"
+  "name": "iescarro/lara",
+  "type": "library",
+  "description": "Simple Laravel Scaffold",
+  "keywords": [
+    "laravel",
+    "scaffold"
+  ],
+  "require": {
+    "symfony/console": "^7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Console\\": "src"
     },
-    "autoload": {
-      "psr-4": {
-        "Console\\": "src"
-      },
-      "classmap": ["src"]
-    }
+    "classmap": [
+      "src"
+    ]
+  }
 }
