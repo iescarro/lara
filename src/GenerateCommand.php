@@ -86,7 +86,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('', function(Blueprint \$table) {
+        Schema::create('$tableName', function(Blueprint \$table) {
             \$table->id();
 $columns
             \$table->timestamps();
@@ -130,20 +130,88 @@ class $modelName extends Model
 
   function generateViews()
   {
+    $currentDirectory = __DIR__;
+    $stubDirectory = dirname($currentDirectory);
+
+    $className = ucfirst($this->component);
+    $tableName = lcfirst($this->component) . 's';
+    $variableName = lcfirst($this->component);
+
     $viewsDirectory = 'resources/views/' . strtolower($this->component) . 's';
     if (!is_dir($viewsDirectory)) {
       mkdir($viewsDirectory, 0777, true);
     }
+
+    $this->generateAddView($viewsDirectory, $stubDirectory, $className, $tableName);
+
+    $this->generateEditView($viewsDirectory, $stubDirectory, $className, $tableName);
+
+    // $editViewFileName = $viewsDirectory . '/edit.blade.php';
+    // $editViewContent = file_get_contents($stubDirectory . '/stubs/views/edit.stub.php');
+    // file_put_contents($editViewFileName, $editViewContent);
+
+    $this->generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName);
+  }
+
+  function generateAddView($viewsDirectory, $stubDirectory, $className, $tableName)
+  {
     $addViewFileName = $viewsDirectory . '/add.blade.php';
-    $addViewContent = '';
+    $addViewContent = file_get_contents($stubDirectory . '/stubs/views/add.stub.php');
+    $addFormGroups = '';
+    foreach ($this->fields as $field) {
+      list($name, $type) = explode(':', $field);
+      $fieldName = ucwords($name);
+      $addFormGroups .= "<div class=\"form-group\">
+    <label for=\"$name\">$fieldName</label>
+    <input type=\"text\" id=\"$name\" name=\"$name\" class=\"form-control\" value=\"{{ old('$name') }}\">
+  </div>";
+    }
+    $addViewContent = str_replace(
+      ['{{className}}', '{{formGroups', '{{tableName'],
+      [$className, $addFormGroups, $tableName],
+      $addViewContent
+    );
     file_put_contents($addViewFileName, $addViewContent);
+  }
 
-    $editViewFileName = $viewsDirectory . '/edit.blade.php';
-    $editViewContent = '';
-    file_put_contents($editViewFileName, $editViewContent);
+  function generateEditView($viewsDirectory, $stubDirectory, $className, $tableName)
+  {
+    $addViewFileName = $viewsDirectory . '/edit.blade.php';
+    $addViewContent = file_get_contents($stubDirectory . '/stubs/views/edit.stub.php');
+    $addFormGroups = '';
+    foreach ($this->fields as $field) {
+      list($name, $type) = explode(':', $field);
+      $fieldName = ucwords($name);
+      $addFormGroups .= "<div class=\"form-group\">
+    <label for=\"$name\">$fieldName</label>
+    <input type=\"text\" id=\"$name\" name=\"$name\" class=\"form-control\" value=\"{{ old('$name') }}\">
+  </div>";
+    }
+    $addViewContent = str_replace(
+      ['{{className}}', '{{formGroups', '{{tableName'],
+      [$className, $addFormGroups, $tableName],
+      $addViewContent
+    );
+    file_put_contents($addViewFileName, $addViewContent);
+  }
 
+  function generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName)
+  {
     $indexViewFileName = $viewsDirectory . '/index.blade.php';
-    $indexViewContent = '';
+    $indexViewContent = file_get_contents($stubDirectory . '/stubs/views/index.stub.php');
+    $columnHeaders = '';
+    $columns = '';
+    foreach ($this->fields as $field) {
+      list($name, $type) = explode(':', $field);
+      $headerName = ucfirst($name);
+      $columnHeaders .= "    <th>$headerName</th>\n";
+      $columns .= "    <td>{{ \${$variableName}->$name }}</td>\n";
+    }
+    $indexViewContent = str_replace(
+      ['{{className}}', '{{tableName}}', '{{columnHeaders}}', '{{columns}}', '{{variableName}}'],
+      [$className, $tableName, $columnHeaders, $columns, $variableName],
+      $indexViewContent
+    );
     file_put_contents($indexViewFileName, $indexViewContent);
   }
 
@@ -154,7 +222,6 @@ class $modelName extends Model
       mkdir($controllerDirectory, 0777, true);
     }
     $controllerName = ucwords($this->component) . 'sController';
-    $componentName = lcfirst($this->component);
     $componentsName = lcfirst($this->component) . 's';
     $className = ucwords($this->component);
     $variableName = '$' . lcfirst($this->component);
