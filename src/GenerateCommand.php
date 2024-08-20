@@ -29,10 +29,7 @@ class GenerateCommand extends Command
   {
     $component = $input->getArgument('component');
     $fields = $input->getArgument('fields');
-    // foreach ($fields as $field) {
-    //   list($name, $type) = explode(':', $field);
-    //   $output->writeln(sprintf('Field: %s, Type: %s', $name, $type));
-    // }
+
     $generator = new Generator($component, $fields);
     $generator->scaffold();
     return Command::SUCCESS;
@@ -52,16 +49,20 @@ class Generator
 
   function scaffold()
   {
-    $this->generateMigration();
-    $this->generateModel();
-    $this->generateViews();
-    $this->generateController();
+    $currentDirectory = __DIR__;
+    $stubDirectory = dirname($currentDirectory);
+
+    $this->generateMigration($stubDirectory);
+    $this->generateModel($stubDirectory);
+    $this->generateViews($stubDirectory);
+    $this->generateController($stubDirectory);
     $this->updateRoute();
   }
 
-  function generateMigration()
+  function generateMigration($stubDirectory)
   {
     $migrationDirectory = 'database/migrations';
+    $content = file_get_contents($stubDirectory . '/stubs/migration.stub.php');
     if (!is_dir($migrationDirectory)) {
       mkdir($migrationDirectory, 0777, true);
     }
@@ -73,66 +74,38 @@ class Generator
       list($name, $type) = explode(':', $field);
       $columns .= '            $table->' . $type . "('" . $name . "');\n";
     }
-    $content = "<?php
-
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::create('$tableName', function(Blueprint \$table) {
-            \$table->id();
-$columns
-            \$table->timestamps();
-        });
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('$tableName');
-    }
-};
-";
+    $content = str_replace(
+      ['{{tableName}}', '{{columns}}'],
+      [$tableName, $columns],
+      $content
+    );
     file_put_contents($filename, $content);
   }
 
-  function generateModel()
+  function generateModel($stubDirectory)
   {
     $modelDirectory = 'app/Models';
+    $content = file_get_contents($stubDirectory . '/stubs/model.stub.php');
     if (!is_dir($modelDirectory)) {
       mkdir($modelDirectory, 0777, true);
     }
-    $modelName = ucwords($this->component);
-    $filename = $modelDirectory . '/' . $modelName . '.php';
-    $content = "<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class $modelName extends Model
-{
-    use HasFactory;
-}
-";
+    $className = ucwords($this->component);
+    $filename = $modelDirectory . '/' . $className . '.php';
+    $properties = '';
+    foreach ($this->fields as $field) {
+      list($name, $type) = explode(':', $field);
+      $properties .= "            '" . $name . "' => 'required',\n";
+    }
+    $content = str_replace(
+      ['{{className}}', '{{properties}}'],
+      [$className, $properties],
+      $content
+    );
     file_put_contents($filename, $content);
   }
 
-  function generateViews()
+  function generateViews($stubDirectory)
   {
-    $currentDirectory = __DIR__;
-    $stubDirectory = dirname($currentDirectory);
-
     $className = ucfirst($this->component);
     $classesName = ucfirst($this->component) . 's';
     $tableName = lcfirst($this->component) . 's';
@@ -144,13 +117,7 @@ class $modelName extends Model
     }
 
     $this->generateAddView($viewsDirectory, $stubDirectory, $className, $tableName);
-
     $this->generateEditView($viewsDirectory, $stubDirectory, $className, $tableName);
-
-    // $editViewFileName = $viewsDirectory . '/edit.blade.php';
-    // $editViewContent = file_get_contents($stubDirectory . '/stubs/views/edit.stub.php');
-    // file_put_contents($editViewFileName, $editViewContent);
-
     $this->generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName, $classesName);
   }
 
@@ -216,9 +183,10 @@ class $modelName extends Model
     file_put_contents($indexViewFileName, $indexViewContent);
   }
 
-  function generateController()
+  function generateController($stubDirectory)
   {
     $controllerDirectory = 'app/Http/Controllers';
+    $content = file_get_contents($stubDirectory . '/stubs/controller.stub.php');
     if (!is_dir($controllerDirectory)) {
       mkdir($controllerDirectory, 0777, true);
     }
@@ -228,52 +196,17 @@ class $modelName extends Model
     $variableName = '$' . lcfirst($this->component);
     $arrayName = '$' . lcfirst($this->component) . 's';
     $filename = $controllerDirectory . '/' . $controllerName . '.php';
-    $content = "<?php
-
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use App\Models\\$className;
-
-class $controllerName extends Controller
-{
-    public function index()
-    {
-        $arrayName = $className::all();
-        return view('$componentsName.index', ['$componentsName' => $arrayName]);
+    $parameters = '';
+    foreach ($this->fields as $field) {
+      list($name, $type) = explode(':', $field);
+      $parameters .= '"' . $name . '", ';
     }
-
-    public function add()
-    {
-        return view('$componentsName.add');
-    }
-
-    public function store(Request \$request)
-    {
-        $className::create(\$request->all());
-        redirect()->route('$componentsName.index')
-            ->with('success', '$className created successfully.');
-    }
-
-    public function edit($className $variableName)
-    {
-        return view('$componentsName.edit', ['post' => $variableName]);
-    }
-
-    private function update(Request \$request)
-    {
-        $className::update(\$request->all());
-        redirect()->route('$componentsName.index')
-            ->with('success', '$className updated successfully.');
-    }
-
-    public function destroy($className $variableName)
-    {
-        {$variableName}->delete();
-        redirect()->route('$arrayName.index')
-            ->with('success', '$className deleted successfully.');
-    }
-}";
+    $parameters = trim(trim($parameters), ",");
+    $content = str_replace(
+      ['{{className}}', '{{controllerName}}', '{{arrayName}}', '{{componentsName}}', '{{variableName}}', '{{parameters}}'],
+      [$className, $controllerName, $arrayName, $componentsName, $variableName, $parameters],
+      $content
+    );
     file_put_contents($filename, $content);
   }
 
