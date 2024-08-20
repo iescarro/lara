@@ -134,6 +134,7 @@ class $modelName extends Model
     $stubDirectory = dirname($currentDirectory);
 
     $className = ucfirst($this->component);
+    $classesName = ucfirst($this->component) . 's';
     $tableName = lcfirst($this->component) . 's';
     $variableName = lcfirst($this->component);
 
@@ -150,7 +151,7 @@ class $modelName extends Model
     // $editViewContent = file_get_contents($stubDirectory . '/stubs/views/edit.stub.php');
     // file_put_contents($editViewFileName, $editViewContent);
 
-    $this->generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName);
+    $this->generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName, $classesName);
   }
 
   function generateAddView($viewsDirectory, $stubDirectory, $className, $tableName)
@@ -195,7 +196,7 @@ class $modelName extends Model
     file_put_contents($addViewFileName, $addViewContent);
   }
 
-  function generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName)
+  function generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName, $classesName)
   {
     $indexViewFileName = $viewsDirectory . '/index.blade.php';
     $indexViewContent = file_get_contents($stubDirectory . '/stubs/views/index.stub.php');
@@ -208,8 +209,8 @@ class $modelName extends Model
       $columns .= "    <td>{{ \${$variableName}->$name }}</td>\n";
     }
     $indexViewContent = str_replace(
-      ['{{className}}', '{{tableName}}', '{{columnHeaders}}', '{{columns}}', '{{variableName}}'],
-      [$className, $tableName, $columnHeaders, $columns, $variableName],
+      ['{{className}}', '{{tableName}}', '{{columnHeaders}}', '{{columns}}', '{{variableName}}', '{{classesName}}'],
+      [$className, $tableName, $columnHeaders, $columns, $variableName, $classesName],
       $indexViewContent
     );
     file_put_contents($indexViewFileName, $indexViewContent);
