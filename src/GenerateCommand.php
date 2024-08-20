@@ -168,7 +168,7 @@ class $modelName extends Model
   </div>";
     }
     $addViewContent = str_replace(
-      ['{{className}}', '{{formGroups', '{{tableName'],
+      ['{{className}}', '{{formGroups}}', '{{tableName}}'],
       [$className, $addFormGroups, $tableName],
       $addViewContent
     );
@@ -189,7 +189,7 @@ class $modelName extends Model
   </div>";
     }
     $addViewContent = str_replace(
-      ['{{className}}', '{{formGroups', '{{tableName'],
+      ['{{className}}', '{{formGroups}}', '{{tableName}}'],
       [$className, $addFormGroups, $tableName],
       $addViewContent
     );
