@@ -1,4 +1,4 @@
-<h1>Add {{className}}</h1>
+<h1>Edit {{variableName}}</h1>
 
 @if ($errors->any())
 <div class="alert alert-danger">
@@ -10,10 +10,10 @@
 </div>
 @endif
 
-<form action="{{ route('{{tableName}}.update') }}" method="POST">
+<form action="{{ route('{{tableName}}.update', '{{variableName}}->id') }}" method="POST">
   @csrf
   @method('PUT')
   {{formGroups}}
 
-  <button type="submit" class="btn btn-primary">Update {{className}}</button>
+  <button type="submit" class="btn btn-outline-primary">Update {{variableName}}</button>
 </form>

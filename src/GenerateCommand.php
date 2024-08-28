@@ -116,15 +116,15 @@ class Generator
       mkdir($viewsDirectory, 0777, true);
     }
 
-    $this->generateAddView($viewsDirectory, $stubDirectory, $className, $tableName);
+    $this->generateCreateView($viewsDirectory, $stubDirectory, $className, $tableName);
     $this->generateEditView($viewsDirectory, $stubDirectory, $className, $tableName);
     $this->generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName, $classesName);
   }
 
-  function generateAddView($viewsDirectory, $stubDirectory, $className, $tableName)
+  function generateCreateView($viewsDirectory, $stubDirectory, $className, $tableName)
   {
-    $addViewFileName = $viewsDirectory . '/add.blade.php';
-    $addViewContent = file_get_contents($stubDirectory . '/stubs/views/add.stub.php');
+    $addViewFileName = $viewsDirectory . '/create.blade.php';
+    $addViewContent = file_get_contents($stubDirectory . '/stubs/views/create.stub.php');
     $addFormGroups = '';
     foreach ($this->fields as $field) {
       list($name, $type) = explode(':', $field);
@@ -191,6 +191,7 @@ class Generator
       mkdir($controllerDirectory, 0777, true);
     }
     $controllerName = ucwords($this->component) . 'sController';
+    $componentName = $this->component;
     $componentsName = lcfirst($this->component) . 's';
     $className = ucwords($this->component);
     $variableName = '$' . lcfirst($this->component);
@@ -203,8 +204,8 @@ class Generator
     }
     $parameters = trim(trim($parameters), ",");
     $content = str_replace(
-      ['{{className}}', '{{controllerName}}', '{{arrayName}}', '{{componentsName}}', '{{variableName}}', '{{parameters}}'],
-      [$className, $controllerName, $arrayName, $componentsName, $variableName, $parameters],
+      ['{{className}}', '{{controllerName}}', '{{arrayName}}', '{{componentsName}}', '{{variableName}}', '{{parameters}}', '{{componentName}}'],
+      [$className, $controllerName, $arrayName, $componentsName, $variableName, $parameters, $componentName],
       $content
     );
     file_put_contents($filename, $content);
@@ -220,13 +221,16 @@ class Generator
     $controllerName = ucwords($this->component) . 'sController';
     $variableName = strtolower($this->component);
     $arrayName = strtolower($this->component) . 's';
+    //     $content = "
+    // Route::get('/$arrayName', [$controllerName::class, 'index'])->name('$arrayName.index');
+    // Route::get('/$arrayName/add', [$controllerName::class, 'add'])->name('$arrayName.add');
+    // Route::post('/$arrayName/store', [$controllerName::class, 'store'])->name('$arrayName.store');
+    // Route::get('/$arrayName/edit', [$controllerName::class, 'edit'])->name('$arrayName.edit');
+    // Route::put('/$arrayName/update', [$controllerName::class, 'update'])->name('$arrayName.update');
+    // Route::delete('/$arrayName/{$variableName}', [$controllerName::class, 'destroy'])->name('$arrayName.destroy');";
     $content = "
-Route::get('/$arrayName', [$controllerName::class, 'index'])->name('$arrayName.index');
-Route::get('/$arrayName/add', [$controllerName::class, 'add'])->name('$arrayName.add');
-Route::post('/$arrayName/store', [$controllerName::class, 'store'])->name('$arrayName.store');
-Route::get('/$arrayName/edit', [$controllerName::class, 'edit'])->name('$arrayName.edit');
-Route::put('/$arrayName/update', [$controllerName::class, 'update'])->name('$arrayName.update');
-Route::delete('/$arrayName/{$variableName}', [$controllerName::class, 'destroy'])->name('$arrayName.destroy');";
+use App\Http\Controllers\\$controllerName;
+Route::resource('/$arrayName', $controllerName::class);";
     $routeFile = fopen($routeFileName, 'a');
     if ($routeFile) {
       fwrite($routeFile, $content);

@@ -1,8 +1,8 @@
 <h3>{{classesName}} List</h3>
 <p>
-  <a href="{{ route('{{tableName}}.add') }}">Add New {{className}}</a>
+  <a href="{{ route('{{tableName}}.add') }}">Create {{variableName}}</a>
 </p>
-<table>
+<table class="table table-hover">
   <tr>
     {{columnHeaders}}
   </tr>

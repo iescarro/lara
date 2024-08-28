@@ -13,7 +13,7 @@ class {{controllerName}} extends Controller
         return view('{{componentsName}}.index', ['{{componentsName}}' => {{arrayName}}]);
     }
 
-    public function add()
+    public function create()
     {
         return view('{{componentsName}}.add');
     }
@@ -27,23 +27,30 @@ class {{controllerName}} extends Controller
             ->with('success', '{{className}} created successfully.');
     }
 
-    public function edit({{className}} {{variableName}})
+    public function show(string $id)
     {
-        return view('{{componentsName}}.edit', ['post' => {{variableName}}]);
+        {{variableName}} = {{className}}::findOrFail($id);
+        return view('{{arrayName}}.show', compact('{{componentName}}'));
     }
 
-    private function update(Request $request)
+    public function edit({{className}} {{variableName}})
+    {
+        {{variableName}} = {{className}}::findOrFail($id);
+        return view('{{componentsName}}.edit', ['{{componentName}}' => {{variableName}}]);
+    }
+
+    private function update(Request $request, string $id)
     {
         {{className}}::validate($request);
         {{variableName}} = $request->only([{{parameters}}]);
-        {{className}}::update({{variableName}});
+        {{variableName}}.save();
         redirect()->route('{{componentsName}}.index')
             ->with('success', '{{className}} updated successfully.');
     }
 
-    public function destroy({{className}} {{variableName}})
+    public function destroy(string $id)
     {
-        {{variableName}}->delete();
+        {{className}}::destroy($id);
         redirect()->route('{{arrayName}}.index')
             ->with('success', '{{className}} deleted successfully.');
     }
