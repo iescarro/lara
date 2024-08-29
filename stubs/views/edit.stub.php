@@ -1,5 +1,4 @@
-<h1>Edit {{variableName}}</h1>
-
+<h3>Edit {{variableName}}</h3>
 @if ($errors->any())
 <div class="alert alert-danger">
   <ul>

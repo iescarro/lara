@@ -15,22 +15,23 @@ class {{controllerName}} extends Controller
 
     public function create()
     {
-        return view('{{componentsName}}.add');
+        return view('{{componentsName}}.create');
     }
 
     public function store(Request $request)
     {
         {{className}}::validate($request);
-        {{variableName}} = $request->only([{{parameters}}]);
-        {{className}}::create({{variableName}});
-        redirect()->route('{{componentsName}}.index')
+        {{variableName}} = new {{className}}();
+{{classAssignments}}
+        {{variableName}}->save();
+        return redirect()->route('{{componentsName}}.index')
             ->with('success', '{{className}} created successfully.');
     }
 
     public function show(string $id)
     {
         {{variableName}} = {{className}}::findOrFail($id);
-        return view('{{arrayName}}.show', compact('{{componentName}}'));
+        return view('{{arrayName}}.show', ['{{componentName}}' => {{variableName}}]);
     }
 
     public function edit({{className}} {{variableName}})
@@ -42,16 +43,17 @@ class {{controllerName}} extends Controller
     private function update(Request $request, string $id)
     {
         {{className}}::validate($request);
-        {{variableName}} = $request->only([{{parameters}}]);
+        {{variableName}} = {{className}}::findOrFail($id);
+{{classAssignments}}
         {{variableName}}.save();
-        redirect()->route('{{componentsName}}.index')
+        return redirect()->route('{{componentsName}}.index')
             ->with('success', '{{className}} updated successfully.');
     }
 
     public function destroy(string $id)
     {
         {{className}}::destroy($id);
-        redirect()->route('{{arrayName}}.index')
+        return redirect()->route('{{componentsName}}.index')
             ->with('success', '{{className}} deleted successfully.');
     }
 }

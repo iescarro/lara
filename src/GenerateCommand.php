@@ -119,6 +119,7 @@ class Generator
     $this->generateCreateView($viewsDirectory, $stubDirectory, $className, $tableName);
     $this->generateEditView($viewsDirectory, $stubDirectory, $className, $tableName);
     $this->generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName, $classesName);
+    $this->generateShowView($viewsDirectory, $stubDirectory, $classesName, $variableName);
   }
 
   function generateCreateView($viewsDirectory, $stubDirectory, $className, $tableName)
@@ -183,6 +184,27 @@ class Generator
     file_put_contents($indexViewFileName, $indexViewContent);
   }
 
+  function generateShowView($viewsDirectory, $stubDirectory, $className, $variableName)
+  {
+    $showViewFileName = $viewsDirectory . '/show.blade.php';
+    $showViewContent = file_get_contents($stubDirectory . '/stubs/views/show.stub.php');
+    $componentsName = lcfirst($this->component) . 's';
+    $properties = '';
+    foreach ($this->fields as $field) {
+      list($name, $type) = explode(':', $field);
+      $label = ucfirst($name);
+      $properties .= "<p><strong>$label</strong>:
+    {{ $" . $variableName . "->" . $name . " }}
+</p>\n";
+    }
+    $showViewContent = str_replace(
+      ['{{className}}', '{{variableName}}', '{{componentsName}}', '{{properties}}'],
+      [$className, $variableName, $componentsName, $properties],
+      $showViewContent
+    );
+    file_put_contents($showViewFileName, $showViewContent);
+  }
+
   function generateController($stubDirectory)
   {
     $controllerDirectory = 'app/Http/Controllers';
@@ -191,21 +213,23 @@ class Generator
       mkdir($controllerDirectory, 0777, true);
     }
     $controllerName = ucwords($this->component) . 'sController';
-    $componentName = $this->component;
+    $componentName = lcfirst($this->component);
     $componentsName = lcfirst($this->component) . 's';
     $className = ucwords($this->component);
     $variableName = '$' . lcfirst($this->component);
     $arrayName = '$' . lcfirst($this->component) . 's';
     $filename = $controllerDirectory . '/' . $controllerName . '.php';
     $parameters = '';
+    $classAssignments = '';
     foreach ($this->fields as $field) {
       list($name, $type) = explode(':', $field);
       $parameters .= '"' . $name . '", ';
+      $classAssignments .= '        ' . $variableName . '->' . $name . " = \$request->input('" . $name . "');\n";
     }
     $parameters = trim(trim($parameters), ",");
     $content = str_replace(
-      ['{{className}}', '{{controllerName}}', '{{arrayName}}', '{{componentsName}}', '{{variableName}}', '{{parameters}}', '{{componentName}}'],
-      [$className, $controllerName, $arrayName, $componentsName, $variableName, $parameters, $componentName],
+      ['{{className}}', '{{controllerName}}', '{{arrayName}}', '{{componentsName}}', '{{variableName}}', '{{parameters}}', '{{componentName}}', '{{classAssignments}}'],
+      [$className, $controllerName, $arrayName, $componentsName, $variableName, $parameters, $componentName, $classAssignments],
       $content
     );
     file_put_contents($filename, $content);

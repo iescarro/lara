@@ -1,5 +1,4 @@
-<h1>Create {{variableName}}</h1>
-
+<h3>Create {{variableName}}</h3>
 @if ($errors->any())
 <div class="alert alert-danger">
   <ul>
