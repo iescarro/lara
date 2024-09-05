@@ -9,10 +9,16 @@
 </div>
 @endif
 
-<form action="{{ route('{{tableName}}.update', '{{variableName}}->id') }}" method="POST">
+<form action="{{ route('{{tableName}}.update', {{variableName}}->id) }}" method="POST">
   @csrf
   @method('PUT')
   {{formGroups}}
 
   <button type="submit" class="btn btn-outline-primary">Update {{componentName}}</button>
+</form>
+
+<form action="{{ route('{{tableName}}', {{variableName}}->id) }}" method="POST">
+  @csrf
+  @method('DELETE')
+  <button type="submit" class="btn btn-danger">Delete</button>
 </form>

@@ -40,12 +40,12 @@ class {{controllerName}} extends Controller
         return view('{{componentsName}}.edit', ['{{componentName}}' => {{variableName}}]);
     }
 
-    private function update(Request $request, string $id)
+    public function update(Request $request, string $id)
     {
         {{className}}::validate($request);
         {{variableName}} = {{className}}::findOrFail($id);
 {{classAssignments}}
-        {{variableName}}.save();
+        {{variableName}}->save();
         return redirect()->route('{{componentsName}}.index')
             ->with('success', '{{className}} updated successfully.');
     }
