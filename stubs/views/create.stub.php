@@ -1,4 +1,4 @@
-<h3>Create {{variableName}}</h3>
+<h3>Create {{componentName}}</h3>
 @if ($errors->any())
 <div class="alert alert-danger">
   <ul>
@@ -13,5 +13,5 @@
   @csrf
   {{formGroups}}
 
-  <button type="submit" class="btn btn-outline-primary">Save {{variableName}}</button>
+  <button type="submit" class="btn btn-outline-primary">Save {{componentName}}</button>
 </form>

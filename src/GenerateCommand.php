@@ -106,65 +106,69 @@ class Generator
 
   function generateViews($stubDirectory)
   {
+    $componentName = lcfirst($this->component);
     $className = ucfirst($this->component);
     $classesName = ucfirst($this->component) . 's';
     $tableName = lcfirst($this->component) . 's';
-    $variableName = lcfirst($this->component);
+    $variableName = '$' . lcfirst($this->component);
 
     $viewsDirectory = 'resources/views/' . strtolower($this->component) . 's';
     if (!is_dir($viewsDirectory)) {
       mkdir($viewsDirectory, 0777, true);
     }
 
-    $this->generateCreateView($viewsDirectory, $stubDirectory, $className, $tableName);
-    $this->generateEditView($viewsDirectory, $stubDirectory, $className, $tableName);
-    $this->generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName, $classesName);
+    $this->generateCreateView($viewsDirectory, $stubDirectory, $className, $tableName, $componentName);
+    $this->generateEditView($viewsDirectory, $stubDirectory, $className, $tableName, $componentName);
+    $this->generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName, $classesName, $componentName);
     $this->generateShowView($viewsDirectory, $stubDirectory, $classesName, $variableName);
   }
 
-  function generateCreateView($viewsDirectory, $stubDirectory, $className, $tableName)
+  function generateCreateView($viewsDirectory, $stubDirectory, $className, $tableName, $componentName)
   {
     $addViewFileName = $viewsDirectory . '/create.blade.php';
     $addViewContent = file_get_contents($stubDirectory . '/stubs/views/create.stub.php');
-    $addFormGroups = '';
+    $formGroups = '';
     foreach ($this->fields as $field) {
       list($name, $type) = explode(':', $field);
       $fieldName = ucwords($name);
-      $addFormGroups .= "<div class=\"form-group\">
+      $formGroups .= "
+  <div class=\"form-group\">
     <label for=\"$name\">$fieldName</label>
     <input type=\"text\" id=\"$name\" name=\"$name\" class=\"form-control\" value=\"{{ old('$name') }}\">
   </div>";
     }
     $addViewContent = str_replace(
-      ['{{className}}', '{{formGroups}}', '{{tableName}}'],
-      [$className, $addFormGroups, $tableName],
+      ['{{className}}', '{{formGroups}}', '{{tableName}}', '{{componentName}}'],
+      [$className, $formGroups, $tableName, $componentName],
       $addViewContent
     );
     file_put_contents($addViewFileName, $addViewContent);
   }
 
-  function generateEditView($viewsDirectory, $stubDirectory, $className, $tableName)
+  function generateEditView($viewsDirectory, $stubDirectory, $className, $tableName, $componentName)
   {
     $addViewFileName = $viewsDirectory . '/edit.blade.php';
     $addViewContent = file_get_contents($stubDirectory . '/stubs/views/edit.stub.php');
-    $addFormGroups = '';
+    $formGroups = '';
+    $variableName = '$' . $componentName;
     foreach ($this->fields as $field) {
       list($name, $type) = explode(':', $field);
       $fieldName = ucwords($name);
-      $addFormGroups .= "<div class=\"form-group\">
+      $formGroups .= "
+  <div class=\"form-group\">
     <label for=\"$name\">$fieldName</label>
-    <input type=\"text\" id=\"$name\" name=\"$name\" class=\"form-control\" value=\"{{ old('$name') }}\">
+    <input type=\"text\" id=\"$name\" name=\"$name\" class=\"form-control\" value=\"{{ {$variableName}->{$name}') }}\">
   </div>";
     }
     $addViewContent = str_replace(
-      ['{{className}}', '{{formGroups}}', '{{tableName}}'],
-      [$className, $addFormGroups, $tableName],
+      ['{{className}}', '{{formGroups}}', '{{tableName}}', '{{componentName}}', '{{variableName}}'],
+      [$className, $formGroups, $tableName, $componentName, $variableName],
       $addViewContent
     );
     file_put_contents($addViewFileName, $addViewContent);
   }
 
-  function generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName, $classesName)
+  function generateIndexView($viewsDirectory, $stubDirectory, $className, $tableName, $variableName, $classesName, $componentName)
   {
     $indexViewFileName = $viewsDirectory . '/index.blade.php';
     $indexViewContent = file_get_contents($stubDirectory . '/stubs/views/index.stub.php');
@@ -177,8 +181,8 @@ class Generator
       $columns .= "    <td>{{ \${$variableName}->$name }}</td>\n";
     }
     $indexViewContent = str_replace(
-      ['{{className}}', '{{tableName}}', '{{columnHeaders}}', '{{columns}}', '{{variableName}}', '{{classesName}}'],
-      [$className, $tableName, $columnHeaders, $columns, $variableName, $classesName],
+      ['{{className}}', '{{tableName}}', '{{columnHeaders}}', '{{columns}}', '{{variableName}}', '{{classesName}}', '{{componentName}}'],
+      [$className, $tableName, $columnHeaders, $columns, $variableName, $classesName, $componentName],
       $indexViewContent
     );
     file_put_contents($indexViewFileName, $indexViewContent);

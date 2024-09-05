@@ -1,18 +1,18 @@
-<h3>{{classesName}} List</h3>
+<h3>{{classesName}}</h3>
 <p>
-  <a href="{{ route('{{tableName}}.add') }}">Create {{variableName}}</a>
+  <a href="{{ route('{{tableName}}.add') }}" class="btn btn-outline-primary">Create {{componentName}}</a>
 </p>
+@if ({{variableName}}->isEmpty())
+<p>No {{tableName}} available.</p>
+@else
 <table class="table table-hover">
   <tr>
-    {{columnHeaders}}
+{{columnHeaders}}
   </tr>
-  @if (${{tableName}}->isEmpty())
-  <p>No {{tableName}} available.</p>
-  @else
   <tr>
-    @foreach (${{tableName}} as ${{variableName}})
-    {{columns}}
+    @foreach (${{tableName}} as {{variableName}})
+{{columns}}
     @endforeach
   </tr>
-  @endif
 </table>
+@endif

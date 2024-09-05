@@ -1,4 +1,4 @@
-<h3>Edit {{variableName}}</h3>
+<h3>Edit {{componentName}}</h3>
 @if ($errors->any())
 <div class="alert alert-danger">
   <ul>
@@ -14,5 +14,5 @@
   @method('PUT')
   {{formGroups}}
 
-  <button type="submit" class="btn btn-outline-primary">Update {{variableName}}</button>
+  <button type="submit" class="btn btn-outline-primary">Update {{componentName}}</button>
 </form>
