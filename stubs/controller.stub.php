@@ -34,7 +34,7 @@ class {{controllerName}} extends Controller
         return view('{{arrayName}}.show', ['{{componentName}}' => {{variableName}}]);
     }
 
-    public function edit({{className}} {{variableName}})
+    public function edit(string $id)
     {
         {{variableName}} = {{className}}::findOrFail($id);
         return view('{{componentsName}}.edit', ['{{componentName}}' => {{variableName}}]);

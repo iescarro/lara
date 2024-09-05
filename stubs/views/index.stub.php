@@ -1,6 +1,6 @@
 <h3>{{classesName}}</h3>
 <p>
-  <a href="{{ route('{{tableName}}.add') }}" class="btn btn-outline-primary">Create {{componentName}}</a>
+  <a href="{{ route('{{tableName}}.create') }}" class="btn btn-outline-primary">Create {{componentName}}</a>
 </p>
 @if (${{tableName}}->isEmpty())
 <p>No {{tableName}} available.</p>
@@ -10,7 +10,7 @@
 {{columnHeaders}}
   </tr>
   @foreach (${{tableName}} as {{variableName}})
-  <tr>    
+  <tr>
 {{columns}}
   </tr>
   @endforeach

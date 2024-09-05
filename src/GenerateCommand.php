@@ -262,7 +262,7 @@ class Generator
     // Route::delete('/$arrayName/{$variableName}', [$controllerName::class, 'destroy'])->name('$arrayName.destroy');";
     $content = "
 use App\Http\Controllers\\$controllerName;
-Route::resource('/$arrayName', $controllerName::class);";
+Route::resource('$arrayName', $controllerName::class);";
     $routeFile = fopen($routeFileName, 'a');
     if ($routeFile) {
       fwrite($routeFile, $content);
