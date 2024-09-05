@@ -178,8 +178,12 @@ class Generator
       list($name, $type) = explode(':', $field);
       $headerName = ucfirst($name);
       $columnHeaders .= "    <th>$headerName</th>\n";
-      $columns .= "    <td>{{ \{$variableName}->$name }}</td>\n";
+      $columns .= "    <td>{{ {$variableName}->$name }}</td>\n";
     }
+    $columnHeaders .= '    <th></th>';
+    $columns .= "    <td>
+      <a href=\"{{ route('{$tableName}.edit', {$variableName}->id) }}\">Edit</a>
+    </td>\n";
     $indexViewContent = str_replace(
       ['{{className}}', '{{tableName}}', '{{columnHeaders}}', '{{columns}}', '{{variableName}}', '{{classesName}}', '{{componentName}}'],
       [$className, $tableName, $columnHeaders, $columns, $variableName, $classesName, $componentName],
