@@ -157,7 +157,7 @@ class Generator
       $formGroups .= "
   <div class=\"form-group\">
     <label for=\"$name\">$fieldName</label>
-    <input type=\"text\" id=\"$name\" name=\"$name\" class=\"form-control\" value=\"{{ {$variableName}->{$name}') }}\">
+    <input type=\"text\" id=\"$name\" name=\"$name\" class=\"form-control\" value=\"{{ {$variableName}->{$name} }}\">
   </div>";
     }
     $addViewContent = str_replace(
