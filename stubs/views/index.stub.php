@@ -2,17 +2,17 @@
 <p>
   <a href="{{ route('{{tableName}}.add') }}" class="btn btn-outline-primary">Create {{componentName}}</a>
 </p>
-@if ({{variableName}}->isEmpty())
+@if (${{tableName}}->isEmpty())
 <p>No {{tableName}} available.</p>
 @else
 <table class="table table-hover">
   <tr>
 {{columnHeaders}}
   </tr>
-  <tr>
-    @foreach (${{tableName}} as {{variableName}})
+  @foreach (${{tableName}} as {{variableName}})
+  <tr>    
 {{columns}}
-    @endforeach
   </tr>
+  @endforeach
 </table>
 @endif

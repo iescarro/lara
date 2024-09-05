@@ -178,7 +178,7 @@ class Generator
       list($name, $type) = explode(':', $field);
       $headerName = ucfirst($name);
       $columnHeaders .= "    <th>$headerName</th>\n";
-      $columns .= "    <td>{{ \${$variableName}->$name }}</td>\n";
+      $columns .= "    <td>{{ \{$variableName}->$name }}</td>\n";
     }
     $indexViewContent = str_replace(
       ['{{className}}', '{{tableName}}', '{{columnHeaders}}', '{{columns}}', '{{variableName}}', '{{classesName}}', '{{componentName}}'],
